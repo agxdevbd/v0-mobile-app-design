@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { motion } from "framer-motion"
 import { useRouter } from "next/navigation"
 import { ArrowRight, Moon, Sun, TrendingUp, BookOpen, ChevronRight, Bot } from "lucide-react"
@@ -12,7 +12,6 @@ import { PinEntry } from "@/components/pin-entry"
 import { LoadingScreen } from "@/components/loading-screen"
 import { BangladeshTime } from "@/components/bangladesh-time"
 import { ClimbingAnimation } from "@/components/climbing-animation"
-import { SubscriptionPackage } from "@/components/subscription-package"
 import { LocationNotification } from "@/components/location-notification"
 import { EidGreeting } from "@/components/eid-greeting"
 
@@ -22,17 +21,22 @@ export default function Home() {
   const [isHovering, setIsHovering] = useState(false)
   const [isPinVerified, setIsPinVerified] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-  const [showSubscription, setShowSubscription] = useState(false)
   const [showLocation, setShowLocation] = useState(false)
   const [showEidGreeting, setShowEidGreeting] = useState(false)
   const [buttonSound] = useState(typeof Audio !== "undefined" ? new Audio("/click.mp3") : null)
+  const notificationSoundRef = useRef(null)
 
   useEffect(() => {
+    // Initialize notification sound
+    if (typeof window !== "undefined") {
+      notificationSoundRef.current = new Audio("/notification-sound.mp3")
+      notificationSoundRef.current.volume = 1.0 // Maximum volume
+    }
+
     // Check if user has already verified PIN in this session
     const pinVerified = sessionStorage.getItem("pinVerified")
     if (pinVerified === "true") {
       setIsPinVerified(true)
-      setShowSubscription(true)
     }
 
     // Simulate loading screen
@@ -46,23 +50,39 @@ export default function Home() {
   const playButtonSound = () => {
     if (buttonSound) {
       buttonSound.currentTime = 0
+      buttonSound.volume = 1.0 // Maximum volume
       buttonSound.play().catch((e) => console.log("Audio play failed:", e))
+
+      // Vibrate the phone
+      if (typeof window !== "undefined" && "navigator" in window && "vibrate" in navigator) {
+        navigator.vibrate(100)
+      }
+    }
+  }
+
+  const playNotificationSound = () => {
+    if (typeof window !== "undefined" && notificationSoundRef.current) {
+      notificationSoundRef.current.currentTime = 0
+      notificationSoundRef.current.volume = 1.0 // Maximum volume
+      notificationSoundRef.current.play().catch((e) => console.log("Audio play failed:", e))
     }
   }
 
   const handlePinSuccess = () => {
     setIsPinVerified(true)
     sessionStorage.setItem("pinVerified", "true")
-    setShowSubscription(true)
-  }
 
-  const handleSubscriptionContinue = () => {
-    setShowSubscription(false)
+    // Show location notification
     setShowLocation(true)
 
     // Show Eid greeting after location notification
     setTimeout(() => {
       setShowEidGreeting(true)
+
+      // Vibrate the phone with strong pattern
+      if (typeof window !== "undefined" && "navigator" in window && "vibrate" in navigator) {
+        navigator.vibrate([300, 100, 300, 100, 300, 100, 300, 100, 300])
+      }
     }, 4000)
   }
 
@@ -87,10 +107,6 @@ export default function Home() {
 
   if (!isPinVerified) {
     return <PinEntry onSuccess={handlePinSuccess} />
-  }
-
-  if (showSubscription) {
-    return <SubscriptionPackage onContinue={handleSubscriptionContinue} />
   }
 
   return (

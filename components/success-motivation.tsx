@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Zap } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -13,11 +13,49 @@ interface SuccessMotivationProps {
 export function SuccessMotivation({ onClose }: SuccessMotivationProps) {
   const [isVisible, setIsVisible] = useState(true)
   const [buttonSound] = useState(typeof Audio !== "undefined" ? new Audio("/click.mp3") : null)
+  const notificationSoundRef = useRef(null)
+
+  useEffect(() => {
+    // Initialize notification sound
+    if (typeof window !== "undefined") {
+      notificationSoundRef.current = new Audio("/notification-sound.mp3")
+      notificationSoundRef.current.volume = 1.0 // Maximum volume
+    }
+
+    // Play notification sound
+    playNotificationSound()
+
+    // Vibrate the phone
+    if (typeof window !== "undefined" && "navigator" in window && "vibrate" in navigator) {
+      navigator.vibrate([200, 100, 200, 100, 200])
+    }
+
+    return () => {
+      if (notificationSoundRef.current) {
+        notificationSoundRef.current.pause()
+        notificationSoundRef.current.currentTime = 0
+      }
+    }
+  }, [])
 
   const playButtonSound = () => {
     if (buttonSound) {
       buttonSound.currentTime = 0
+      buttonSound.volume = 1.0 // Maximum volume
       buttonSound.play().catch((e) => console.log("Audio play failed:", e))
+
+      // Vibrate the phone
+      if (typeof window !== "undefined" && "navigator" in window && "vibrate" in navigator) {
+        navigator.vibrate(100)
+      }
+    }
+  }
+
+  const playNotificationSound = () => {
+    if (typeof window !== "undefined" && notificationSoundRef.current) {
+      notificationSoundRef.current.currentTime = 0
+      notificationSoundRef.current.volume = 1.0 // Maximum volume
+      notificationSoundRef.current.play().catch((e) => console.log("Audio play failed:", e))
     }
   }
 
