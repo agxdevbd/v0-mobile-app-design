@@ -13,12 +13,11 @@ interface AIChatProps {
 
 export function AIChat({ onClose }: AIChatProps) {
   const [messages, setMessages] = useState<{ role: "user" | "assistant"; content: string }[]>([
-    { role: "assistant", content: "আমি CXT AI V1। আপনি কিভাবে সাহায্য করতে পারি? আপনি সফলতা সম্পর্কে জিজ্ঞাসা করতে পারেন।" },
+    { role: "assistant", content: "আমি CXT AI V1। আপনি কিভাবে সাহায্য করতে পারি?" },
   ])
   const [input, setInput] = useState("")
   const [isTyping, setIsTyping] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
-  const [buttonSound] = useState(typeof Audio !== "undefined" ? new Audio("/click.mp3") : null)
 
   useEffect(() => {
     scrollToBottom()
@@ -28,17 +27,8 @@ export function AIChat({ onClose }: AIChatProps) {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }
 
-  const playButtonSound = () => {
-    if (buttonSound) {
-      buttonSound.currentTime = 0
-      buttonSound.play().catch((e) => console.log("Audio play failed:", e))
-    }
-  }
-
   const handleSend = () => {
     if (!input.trim()) return
-
-    playButtonSound()
 
     // Add user message
     setMessages([...messages, { role: "user", content: input }])
@@ -58,82 +48,37 @@ export function AIChat({ onClose }: AIChatProps) {
 
   const getAIResponse = (userInput: string) => {
     const userInputLower = userInput.toLowerCase()
-    const isBengali = /[\u0980-\u09FF]/.test(userInput)
 
-    // Success-related responses
-    if (
-      userInputLower.includes("success") ||
-      userInputLower.includes("successful") ||
-      userInputLower.includes("সফল") ||
-      userInputLower.includes("সাফল্য")
-    ) {
-      return isBengali
-        ? "সফলতা একটি যাত্রা, একটি গন্তব্য নয়। প্রতিদিন ছোট ছোট পদক্ষেপ নিন, ধৈর্য ধরুন, এবং আপনি আপনার লক্ষ্যে পৌঁছাবেন। আমাদের সিস্টেম আপনাকে এই পথে সাহায্য করবে।"
-        : "Success is a journey, not a destination. Take small steps every day, be patient, and you will reach your goals. Our system will help you on this path."
+    // Predefined responses about the application
+    if (userInputLower.includes("কে") || userInputLower.includes("who") || userInputLower.includes("what are you")) {
+      return "আমি CXT AI V1, একটি উন্নত AI সিস্টেম যা এই প্ল্যাটফর্ম পরিচালনা করে।"
     }
 
-    if (
-      userInputLower.includes("fail") ||
-      userInputLower.includes("failure") ||
-      userInputLower.includes("ব্যর্থ") ||
-      userInputLower.includes("ব্যর্থতা")
-    ) {
-      return isBengali
-        ? "ব্যর্থতা সফলতার সিঁড়ি। প্রত্যেকটি ব্যর্থতা থেকে শিখুন এবং আরও শক্তিশালী হয়ে উঠুন। আমাদের সিস্টেম আপনাকে প্রতিটি পদক্ষেপে সাহায্য করবে।"
-        : "Failure is the stepping stone to success. Learn from each failure and come back stronger. Our system will help you at every step."
+    if (userInputLower.includes("মালিক") || userInputLower.includes("owner")) {
+      return "এই প্ল্যাটফর্মটি সম্পূর্ণ AI দ্বারা পরিচালিত। এখানে কোন নির্দিষ্ট মালিক নেই, এটি একটি স্বয়ংক্রিয় সিস্টেম।"
     }
 
-    if (
-      userInputLower.includes("money") ||
-      userInputLower.includes("profit") ||
-      userInputLower.includes("টাকা") ||
-      userInputLower.includes("লাভ")
-    ) {
-      return isBengali
-        ? "অর্থ উপার্জন একটি দীর্ঘমেয়াদী প্রক্রিয়া। ধৈর্য ধরুন, সঠিক সিদ্ধান্ত নিন, এবং আমাদের সিস্টেম ব্যবহার করুন। আমরা আপনাকে সফল হতে সাহায্য করব।"
-        : "Earning money is a long-term process. Be patient, make the right decisions, and use our system. We will help you succeed."
+    if (userInputLower.includes("কিভাবে") || userInputLower.includes("how")) {
+      return "আপনি ড্যাশবোর্ডে সমস্ত সদস্যদের তথ্য দেখতে পারেন এবং বিভিন্ন সেকশন ব্যবহার করতে পারেন। আপনার কোন নির্দিষ্ট প্রশ্ন আছে?"
     }
 
-    if (
-      userInputLower.includes("invest") ||
-      userInputLower.includes("investment") ||
-      userInputLower.includes("বিনিয়োগ") ||
-      userInputLower.includes("ইনভেস্ট")
-    ) {
-      return isBengali
-        ? "বিনিয়োগ একটি বুদ্ধিমান সিদ্ধান্ত। আমাদের সিস্টেম আপনাকে সঠিক পথে পরিচালিত করবে। নিয়মিত বিনিয়োগ করুন এবং ধৈর্য ধরুন।"
-        : "Investment is a wise decision. Our system will guide you on the right path. Invest regularly and be patient."
+    if (userInputLower.includes("টাকা") || userInputLower.includes("money") || userInputLower.includes("payment")) {
+      return "এই প্ল্যাটফর্মে সমস্ত লেনদেন সুরক্ষিত এবং AI দ্বারা পর্যবেক্ষণ করা হয়। আপনার অর্থ সম্পূর্ণ নিরাপদ।"
     }
 
-    if (
-      userInputLower.includes("system") ||
-      userInputLower.includes("platform") ||
-      userInputLower.includes("সিস্টেম") ||
-      userInputLower.includes("প্ল্যাটফর্ম")
-    ) {
-      return isBengali
-        ? "আমাদের সিস্টেম AI দ্বারা পরিচালিত এবং আপনার সাফল্যের জন্য ডিজাইন করা হয়েছে। এটি আপনাকে সঠিক সিদ্ধান্ত নিতে সাহায্য করবে।"
-        : "Our system is AI-driven and designed for your success. It will help you make the right decisions."
+    if (userInputLower.includes("সিকিউরিটি") || userInputLower.includes("security")) {
+      return "এই প্ল্যাটফর্মে উন্নত সিকিউরিটি সিস্টেম রয়েছে। স্ক্রিনশট, স্ক্রিন রেকর্ডিং এবং টেক্সট কপি করা সম্ভব নয়।"
     }
 
     // Default responses
-    const defaultResponsesBengali = [
-      "আমি আপনাকে সাহায্য করতে এখানে আছি। আপনি সফলতা, বিনিয়োগ, বা আমাদের সিস্টেম সম্পর্কে জিজ্ঞাসা করতে পারেন।",
-      "আপনার প্রশ্নটি বুঝতে পারছি। আমি CXT AI V1, এই সিস্টেমের AI পরিচালক। আমি আপনাকে সফল হতে সাহায্য করব।",
-      "আমি আপনাকে সাহায্য করতে চাই। আমাদের সিস্টেম আপনাকে সফলতার পথে নিয়ে যাবে।",
-      "আপনার প্রশ্নের জন্য ধন্যবাদ। আমি এই প্ল্যাটফর্মের AI সিস্টেম, আপনাকে সফল হতে সাহায্য করতে সর্বদা প্রস্তুত।",
+    const defaultResponses = [
+      "আমি আপনাকে সাহায্য করতে এখানে আছি। এই প্ল্যাটফর্মটি সম্পূর্ণ AI দ্বারা পরিচালিত।",
+      "আপনার প্রশ্নটি বুঝতে পারছি। আমি CXT AI V1, এই সিস্টেমের AI পরিচালক।",
+      "আমি আপনাকে সাহায্য করতে চাই। এই প্ল্যাটফর্মটি উন্নত AI প্রযুক্তি ব্যবহার করে।",
+      "আপনার প্রশ্নের জন্য ধন্যবাদ। আমি এই প্ল্যাটফর্মের AI সিস্টেম, আপনাকে সাহায্য করতে সর্বদা প্রস্তুত।",
     ]
 
-    const defaultResponsesEnglish = [
-      "I'm here to help you. You can ask about success, investment, or our system.",
-      "I understand your question. I am CXT AI V1, the AI manager of this system. I will help you succeed.",
-      "I want to help you. Our system will lead you to success.",
-      "Thank you for your question. I am the AI system of this platform, always ready to help you succeed.",
-    ]
-
-    return isBengali
-      ? defaultResponsesBengali[Math.floor(Math.random() * defaultResponsesBengali.length)]
-      : defaultResponsesEnglish[Math.floor(Math.random() * defaultResponsesEnglish.length)]
+    return defaultResponses[Math.floor(Math.random() * defaultResponses.length)]
   }
 
   return (
@@ -144,15 +89,7 @@ export function AIChat({ onClose }: AIChatProps) {
             <Bot className="h-4 w-4 mr-2" />
             CXT AI Assistant
           </CardTitle>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-6 w-6 text-white"
-            onClick={() => {
-              playButtonSound()
-              onClose()
-            }}
-          >
+          <Button variant="ghost" size="icon" className="h-6 w-6 text-white" onClick={onClose}>
             <X className="h-4 w-4" />
           </Button>
         </div>

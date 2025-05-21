@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { useRouter } from "next/navigation"
 import { ArrowRight, Moon, Sun, TrendingUp, BookOpen, ChevronRight, Bot } from "lucide-react"
@@ -12,8 +12,6 @@ import { PinEntry } from "@/components/pin-entry"
 import { LoadingScreen } from "@/components/loading-screen"
 import { BangladeshTime } from "@/components/bangladesh-time"
 import { ClimbingAnimation } from "@/components/climbing-animation"
-import { LocationNotification } from "@/components/location-notification"
-import { EidGreeting } from "@/components/eid-greeting"
 
 export default function Home() {
   const router = useRouter()
@@ -21,18 +19,8 @@ export default function Home() {
   const [isHovering, setIsHovering] = useState(false)
   const [isPinVerified, setIsPinVerified] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-  const [showLocation, setShowLocation] = useState(false)
-  const [showEidGreeting, setShowEidGreeting] = useState(false)
-  const [buttonSound] = useState(typeof Audio !== "undefined" ? new Audio("/click.mp3") : null)
-  const notificationSoundRef = useRef(null)
 
   useEffect(() => {
-    // Initialize notification sound
-    if (typeof window !== "undefined") {
-      notificationSoundRef.current = new Audio("/notification-sound.mp3")
-      notificationSoundRef.current.volume = 1.0 // Maximum volume
-    }
-
     // Check if user has already verified PIN in this session
     const pinVerified = sessionStorage.getItem("pinVerified")
     if (pinVerified === "true") {
@@ -47,43 +35,9 @@ export default function Home() {
     return () => clearTimeout(timer)
   }, [])
 
-  const playButtonSound = () => {
-    if (buttonSound) {
-      buttonSound.currentTime = 0
-      buttonSound.volume = 1.0 // Maximum volume
-      buttonSound.play().catch((e) => console.log("Audio play failed:", e))
-
-      // Vibrate the phone
-      if (typeof window !== "undefined" && "navigator" in window && "vibrate" in navigator) {
-        navigator.vibrate(100)
-      }
-    }
-  }
-
-  const playNotificationSound = () => {
-    if (typeof window !== "undefined" && notificationSoundRef.current) {
-      notificationSoundRef.current.currentTime = 0
-      notificationSoundRef.current.volume = 1.0 // Maximum volume
-      notificationSoundRef.current.play().catch((e) => console.log("Audio play failed:", e))
-    }
-  }
-
   const handlePinSuccess = () => {
     setIsPinVerified(true)
     sessionStorage.setItem("pinVerified", "true")
-
-    // Show location notification
-    setShowLocation(true)
-
-    // Show Eid greeting after location notification
-    setTimeout(() => {
-      setShowEidGreeting(true)
-
-      // Vibrate the phone with strong pattern
-      if (typeof window !== "undefined" && "navigator" in window && "vibrate" in navigator) {
-        navigator.vibrate([300, 100, 300, 100, 300, 100, 300, 100, 300])
-      }
-    }, 4000)
   }
 
   const containerVariants = {
@@ -117,19 +71,13 @@ export default function Home() {
         <div className="absolute bottom-1/4 left-1/2 w-64 h-64 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 dark:opacity-20 animate-blob animation-delay-4000"></div>
       </div>
 
-      {showLocation && <LocationNotification />}
-      {showEidGreeting && <EidGreeting onClose={() => setShowEidGreeting(false)} />}
-
       <div className="absolute top-4 right-4 z-50 flex items-center space-x-2">
         <BangladeshTime />
         <Button
           variant="outline"
           size="icon"
           className="rounded-full bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm"
-          onClick={() => {
-            playButtonSound()
-            setTheme(theme === "dark" ? "light" : "dark")
-          }}
+          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
         >
           {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
         </Button>
@@ -166,10 +114,7 @@ export default function Home() {
                     </div>
                     <Button
                       className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
-                      onClick={() => {
-                        playButtonSound()
-                        router.push("/dashboard")
-                      }}
+                      onClick={() => router.push("/dashboard")}
                     >
                       <motion.div
                         className="flex items-center"
@@ -202,10 +147,7 @@ export default function Home() {
                     <Button
                       variant="outline"
                       className="border-emerald-500 dark:border-emerald-400 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20"
-                      onClick={() => {
-                        playButtonSound()
-                        router.push("/learning")
-                      }}
+                      onClick={() => router.push("/learning")}
                     >
                       Explore <ChevronRight className="ml-1 h-4 w-4" />
                     </Button>
@@ -223,15 +165,7 @@ export default function Home() {
           </motion.div>
 
           <motion.div className="mt-4 text-center text-sm text-slate-500 dark:text-slate-400" variants={itemVariants}>
-            <motion.p
-              animate={{
-                color: ["#6366f1", "#8b5cf6", "#ec4899", "#6366f1"],
-              }}
-              transition={{ duration: 5, repeat: Number.POSITIVE_INFINITY }}
-              className="font-medium"
-            >
-              © 2025 CXT Trading Platform • Powered by CXT AI V1
-            </motion.p>
+            <p>© 2025 CXT Trading Platform • Powered by CXT AI V1</p>
           </motion.div>
         </motion.div>
       </div>

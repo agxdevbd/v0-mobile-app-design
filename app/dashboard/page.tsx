@@ -1,25 +1,46 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect } from "react"
+import { motion, AnimatePresence } from "framer-motion"
 import Link from "next/link"
-import { Home, BookOpen, DollarSign, Award, TrendingUp, Sun, Moon, CreditCard, Bell, Sparkles, X } from "lucide-react"
+import {
+  Users,
+  Star,
+  Shield,
+  Calendar,
+  Eye,
+  X,
+  Bot,
+  Sparkles,
+  Home,
+  BookOpen,
+  Moon,
+  Sun,
+  DollarSign,
+  MessageSquare,
+  BookMarked,
+  Award,
+  TrendingUp,
+} from "lucide-react"
+import { Card, CardContent, CardDescription, CardHeader, CardFooter } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogClose,
+} from "@/components/ui/dialog"
 import { useTheme } from "next-themes"
 import { Notification } from "@/components/notification"
+import { BangladeshTime } from "@/components/bangladesh-time"
+import { ClimbingAnimation } from "@/components/climbing-animation"
+import { AIChat } from "@/components/ai-chat"
+import { Quiz } from "@/components/quiz"
 import { useRouter } from "next/navigation"
-import { TryAnimation } from "@/components/try-animation"
-import { SuccessMotivation } from "@/components/success-motivation"
-import { DigitalClock } from "@/components/digital-clock"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { StickyMenu } from "@/components/sticky-menu"
-import { OrdersInstructions } from "@/components/orders-instructions"
-import { RulesSection } from "@/components/rules-section"
-import { SuccessSection } from "@/components/success-section"
-import { LearningContent } from "@/components/learning-content"
-import { EidGreeting } from "@/components/eid-greeting"
 
 export default function Dashboard() {
   const router = useRouter()
@@ -38,19 +59,9 @@ export default function Dashboard() {
   const [showQuiz, setShowQuiz] = useState(false)
   const [showTalkMarketDialog, setShowTalkMarketDialog] = useState(false)
   const [showSuccessDialog, setShowSuccessDialog] = useState(false)
-  const [showSuccessMotivation, setShowSuccessMotivation] = useState(false)
-  const [showEidGreeting, setShowEidGreeting] = useState(false)
   const [buttonSound] = useState(typeof Audio !== "undefined" ? new Audio("/click.mp3") : null)
 
-  const notificationSoundRef = useRef(null)
-
   useEffect(() => {
-    // Initialize notification sound
-    if (typeof window !== "undefined") {
-      notificationSoundRef.current = new Audio("/notification-sound.mp3")
-      notificationSoundRef.current.volume = 1.0 // Maximum volume
-    }
-
     const timer = setTimeout(() => {
       setAnimationComplete(true)
     }, 1500)
@@ -60,25 +71,9 @@ export default function Dashboard() {
       setShowWelcomeNotification(true)
     }, 2000)
 
-    // Show Eid greeting after welcome notification
-    const eidTimer = setTimeout(() => {
-      setShowEidGreeting(true)
-      // Vibrate the phone for 1 second
-      if (typeof window !== "undefined" && "navigator" in window && "vibrate" in navigator) {
-        navigator.vibrate([200, 100, 200, 100, 200, 100, 200])
-      }
-    }, 5000)
-
-    // Show success motivation after Eid greeting
-    const motivationTimer = setTimeout(() => {
-      setShowSuccessMotivation(true)
-    }, 10000)
-
     return () => {
       clearTimeout(timer)
       clearTimeout(notificationTimer)
-      clearTimeout(eidTimer)
-      clearTimeout(motivationTimer)
     }
   }, [])
 
@@ -98,26 +93,7 @@ export default function Dashboard() {
   const playButtonSound = () => {
     if (buttonSound) {
       buttonSound.currentTime = 0
-      buttonSound.volume = 1.0 // Maximum volume
       buttonSound.play().catch((e) => console.log("Audio play failed:", e))
-
-      // Vibrate the phone for 100ms
-      if (typeof window !== "undefined" && "navigator" in window && "vibrate" in navigator) {
-        navigator.vibrate(100)
-      }
-    }
-  }
-
-  const playNotificationSound = () => {
-    if (typeof window !== "undefined" && notificationSoundRef.current) {
-      notificationSoundRef.current.currentTime = 0
-      notificationSoundRef.current.volume = 1.0 // Maximum volume
-      notificationSoundRef.current.play().catch((e) => console.log("Audio play failed:", e))
-
-      // Vibrate the phone for 500ms
-      if (typeof window !== "undefined" && "navigator" in window && "vibrate" in navigator) {
-        navigator.vibrate([100, 50, 100, 50, 100])
-      }
     }
   }
 
@@ -266,125 +242,23 @@ export default function Dashboard() {
     return `${minutes}:${remainingSeconds < 10 ? "0" : ""}${remainingSeconds}`
   }
 
-  const UserCardDialog = ({ user, onClose }) => {
-    if (!user) return null
-
-    // Generate a card number based on user's id
-    const generateCardNumber = (id) => {
-      const baseNumber = "4921"
-      const middlePart = String(id).padStart(4, "0")
-      const endPart = Math.floor(Math.random() * 10000)
-        .toString()
-        .padStart(4, "0")
-      const lastPart = Math.floor(Math.random() * 10000)
-        .toString()
-        .padStart(4, "0")
-      return `${baseNumber} ${middlePart} ${endPart} ${lastPart}`
-    }
-
-    const cardNumber = generateCardNumber(user.id)
-    const expiryDate = "05/28"
-    const cvv = Math.floor(Math.random() * 900) + 100
-
-    return (
-      <Dialog open={true} onOpenChange={onClose}>
-        <DialogContent className="sm:max-w-md bg-gray-900 border-gray-800">
-          <div className="p-1">
-            <div className="bg-gradient-to-br from-gray-900 to-black rounded-xl p-6 shadow-xl overflow-hidden relative">
-              {/* Holographic effects */}
-              <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full -mt-8 -mr-8 blur-xl"></div>
-              <div className="absolute bottom-0 left-0 w-32 h-32 bg-blue-500/10 rounded-full -mb-8 -ml-8 blur-xl"></div>
-
-              {/* Card chip and design elements */}
-              <div className="absolute top-6 right-6">
-                <div className="w-10 h-6 bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-md opacity-80"></div>
-              </div>
-
-              <div className="flex justify-between items-start mb-8">
-                <div>
-                  <div className="text-xs text-gray-500 mb-1">Premium Member</div>
-                  <div className="text-xl font-bold text-white">XTH FOUND CARD</div>
-                </div>
-                <div className="flex space-x-1">
-                  <div className="w-6 h-6 rounded-full bg-yellow-500/80 blur-[1px]"></div>
-                  <div className="w-6 h-6 rounded-full bg-red-500/80 blur-[1px]"></div>
-                </div>
-              </div>
-
-              <div className="mb-6">
-                <div className="text-sm text-gray-500 mb-1">Card Number</div>
-                <div className="text-lg font-mono text-white tracking-wider">{cardNumber}</div>
-              </div>
-
-              <div className="flex justify-between">
-                <div>
-                  <div className="text-xs text-gray-500 mb-1">Card Holder</div>
-                  <div className="text-sm font-medium text-white">{user.name}</div>
-                </div>
-                <div>
-                  <div className="text-xs text-gray-500 mb-1">Expires</div>
-                  <div className="text-sm font-medium text-white">{expiryDate}</div>
-                </div>
-                <div>
-                  <div className="text-xs text-gray-500 mb-1">CVV</div>
-                  <div className="text-sm font-medium text-white">{cvv}</div>
-                </div>
-              </div>
-
-              <div className="absolute bottom-6 right-6">
-                <Sparkles className="h-6 w-6 text-purple-400/50" />
-              </div>
-            </div>
-          </div>
-
-          <div className="flex justify-center mt-2">
-            <Button
-              className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white"
-              onClick={() => {
-                onClose()
-                playButtonSound()
-              }}
-            >
-              Close
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-    )
-  }
-
   return (
-    <main className="min-h-screen bg-slate-100 dark:bg-gray-950 dark:via-purple-950 dark:to-gray-950 text-slate-900 dark:text-white p-4 pb-20">
+    <main className="min-h-screen bg-slate-100 dark:bg-gray-950 dark:via-purple-950 dark:to-gray-950 text-slate-900 dark:text-white p-4">
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl opacity-5 dark:opacity-10 animate-blob"></div>
         <div className="absolute top-3/4 right-1/4 w-64 h-64 bg-yellow-500 rounded-full mix-blend-multiply filter blur-3xl opacity-5 dark:opacity-10 animate-blob animation-delay-2000"></div>
         <div className="absolute bottom-1/4 left-1/2 w-64 h-64 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-5 dark:opacity-10 animate-blob animation-delay-4000"></div>
       </div>
 
-      <TryAnimation />
-
-      {showWelcomeNotification && (
-        <Notification
-          type="welcome"
-          onClose={() => {
-            setShowWelcomeNotification(false)
-            playNotificationSound()
-          }}
-        />
-      )}
+      {showWelcomeNotification && <Notification type="welcome" onClose={() => setShowWelcomeNotification(false)} />}
 
       {showStatsNotification && (
         <Notification
           type="stats"
           stats={{ profit: "0%", return: "18%", members: 60 }}
-          onClose={() => {
-            setShowStatsNotification(false)
-            playNotificationSound()
-          }}
+          onClose={() => setShowStatsNotification(false)}
         />
       )}
-
-      {showEidGreeting && <EidGreeting onClose={() => setShowEidGreeting(false)} />}
 
       {showCostNotification && (
         <Dialog open={showCostNotification} onOpenChange={setShowCostNotification}>
@@ -489,17 +363,9 @@ export default function Dashboard() {
         </Dialog>
       )}
 
-      {showSuccessMotivation && <SuccessMotivation onClose={() => setShowSuccessMotivation(false)} />}
+      {showAIChat && <AIChat onClose={() => setShowAIChat(false)} />}
 
-      {selectedMember && (
-        <UserCardDialog
-          user={selectedMember}
-          onClose={() => {
-            setSelectedMember(null)
-            playButtonSound()
-          }}
-        />
-      )}
+      {showQuiz && <Quiz onClose={() => setShowQuiz(false)} />}
 
       <div className="flex justify-between items-center mb-4 relative z-10">
         <div className="flex space-x-2">
@@ -515,7 +381,7 @@ export default function Dashboard() {
           </Button>
         </div>
         <div className="flex items-center space-x-2">
-          <DigitalClock />
+          <BangladeshTime />
           <Button
             variant="outline"
             size="icon"
@@ -530,128 +396,423 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="max-w-3xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div className="md:col-span-2 space-y-6">
-            <OrdersInstructions />
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="max-w-md mx-auto relative z-10"
+      >
+        <Card className="bg-white dark:bg-gray-900/90 backdrop-blur-sm border-slate-200 dark:border-gray-800 mb-4 overflow-hidden shadow-xl">
+          <CardHeader className="bg-gradient-to-r from-purple-600 to-indigo-600 dark:from-purple-900 dark:to-indigo-900 pb-8 relative">
+            <motion.div
+              className="absolute top-0 right-0 w-32 h-32 bg-white opacity-5 rounded-full -mt-16 -mr-16"
+              animate={{
+                scale: [1, 1.2, 1],
+                rotate: [0, 90, 0],
+              }}
+              transition={{
+                duration: 15,
+                repeat: Number.POSITIVE_INFINITY,
+                repeatType: "reverse",
+              }}
+            />
 
-            <div className="bg-white dark:bg-gray-900 rounded-lg shadow-md p-4">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-bold text-slate-800 dark:text-white">Members</h2>
-                <Input
-                  type="search"
-                  placeholder="Search members..."
-                  className="max-w-xs"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="absolute -top-10 -left-10 w-40 h-40 bg-indigo-500 opacity-10 rounded-full"
+            />
 
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-slate-50 dark:bg-gray-800">
-                    <tr>
-                      <th className="px-4 py-2 text-left text-sm font-medium text-slate-500 dark:text-slate-400">ID</th>
-                      <th className="px-4 py-2 text-left text-sm font-medium text-slate-500 dark:text-slate-400">
-                        Name
-                      </th>
-                      <th className="px-4 py-2 text-left text-sm font-medium text-slate-500 dark:text-slate-400">
-                        Amount
-                      </th>
-                      <th className="px-4 py-2 text-left text-sm font-medium text-slate-500 dark:text-slate-400">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-200 dark:divide-gray-700">
-                    {filteredMembers.slice(0, 10).map((member) => (
-                      <tr key={member.id} className={member.special ? "bg-purple-50 dark:bg-purple-900/20" : ""}>
-                        <td className="px-4 py-3 text-sm text-slate-800 dark:text-slate-300">{member.id}</td>
-                        <td className="px-4 py-3 text-sm text-slate-800 dark:text-slate-300 font-medium">
-                          {member.name}
-                          {member.special && (
-                            <Badge className="ml-2 bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300">
-                              Special
-                            </Badge>
-                          )}
-                        </td>
-                        <td className="px-4 py-3 text-sm text-slate-800 dark:text-slate-300">
-                          ${member.amount.toLocaleString()}
-                        </td>
-                        <td className="px-4 py-3 text-sm">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-900 hover:bg-purple-50 dark:hover:bg-purple-900/20"
-                            onClick={() => {
-                              setSelectedMember(member)
-                              playButtonSound()
-                            }}
-                          >
-                            <CreditCard className="h-3.5 w-3.5 mr-1" /> View Card
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+            <ClimbingAnimation />
 
-              {filteredMembers.length > 10 && (
-                <div className="mt-4 text-center">
-                  <Button variant="outline" onClick={() => playButtonSound()}>
-                    Load More
-                  </Button>
-                </div>
-              )}
+            <motion.div
+              initial={{ x: 100, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ duration: 0.7, delay: 0.1, type: "spring" }}
+            >
+              <CardDescription className="text-slate-200">
+                <span className="flex items-center">
+                  <Bot className="mr-1 h-4 w-4 text-cyan-400" />
+                  AI Control
+                </span>
+              </CardDescription>
+            </motion.div>
+          </CardHeader>
+          <CardContent className="pt-6">
+            <div className="grid grid-cols-2 gap-3 mb-4">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                transition={{ duration: 0.2 }}
+                onClick={() => {
+                  playButtonSound()
+                  setShowStatsNotification(true)
+                }}
+              >
+                <Card className="bg-slate-50 dark:bg-gray-800/70 backdrop-blur-sm border-slate-200 dark:border-gray-700 overflow-hidden cursor-pointer hover:shadow-md transition-all">
+                  <CardContent className="p-3">
+                    <div className="flex items-center">
+                      <Star className="h-5 w-5 mr-2 text-yellow-600 dark:text-yellow-400" />
+                      <div>
+                        <div className="text-sm font-medium text-slate-700 dark:text-white">Community Details</div>
+                        <div className="text-xs text-slate-500 dark:text-slate-400">View stats</div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                transition={{ duration: 0.2 }}
+                onClick={() => {
+                  playButtonSound()
+                  setShowCostNotification(true)
+                }}
+              >
+                <Card className="bg-slate-50 dark:bg-gray-800/70 backdrop-blur-sm border-slate-200 dark:border-gray-700 overflow-hidden cursor-pointer hover:shadow-md transition-all">
+                  <CardContent className="p-3">
+                    <div className="flex items-center">
+                      <DollarSign className="h-5 w-5 mr-2 text-green-600 dark:text-green-400" />
+                      <div>
+                        <div className="text-sm font-medium text-slate-700 dark:text-white">ওয়েবসাইট ব্যয়</div>
+                        <div className="text-xs text-slate-500 dark:text-slate-400">View costs</div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
             </div>
 
-            <RulesSection />
-          </div>
+            <div className="grid grid-cols-2 gap-3 mb-4">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                transition={{ duration: 0.2 }}
+                onClick={() => {
+                  playButtonSound()
+                  setShowTalkMarketDialog(true)
+                }}
+              >
+                <Card className="bg-slate-50 dark:bg-gray-800/70 backdrop-blur-sm border-slate-200 dark:border-gray-700 overflow-hidden cursor-pointer hover:shadow-md transition-all">
+                  <CardContent className="p-3">
+                    <div className="flex items-center">
+                      <TrendingUp className="h-5 w-5 mr-2 text-blue-600 dark:text-blue-400" />
+                      <div>
+                        <div className="text-sm font-medium text-slate-700 dark:text-white">টক মার্কেট সম্পর্কে</div>
+                        <div className="text-xs text-slate-500 dark:text-slate-400">View details</div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
 
-          <div className="space-y-6">
-            <Card className="bg-white dark:bg-gray-900 border-slate-200 dark:border-gray-700 overflow-hidden">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-bold text-slate-800 dark:text-white">Stats</h3>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300"
-                    onClick={() => {
-                      setShowStatsNotification(true)
-                      playButtonSound()
-                    }}
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                transition={{ duration: 0.2 }}
+                onClick={() => {
+                  playButtonSound()
+                  setShowSuccessDialog(true)
+                }}
+              >
+                <Card className="bg-slate-50 dark:bg-gray-800/70 backdrop-blur-sm border-slate-200 dark:border-gray-700 overflow-hidden cursor-pointer hover:shadow-md transition-all">
+                  <CardContent className="p-3">
+                    <div className="flex items-center">
+                      <Award className="h-5 w-5 mr-2 text-yellow-600 dark:text-yellow-400" />
+                      <div>
+                        <div className="text-sm font-medium text-slate-700 dark:text-white">সাকসেসফুল প্রাপ্তি</div>
+                        <div className="text-xs text-slate-500 dark:text-slate-400">View rewards</div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 mb-4">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                transition={{ duration: 0.2 }}
+                onClick={() => {
+                  playButtonSound()
+                  setShowQuiz(true)
+                }}
+              >
+                <Card className="bg-slate-50 dark:bg-gray-800/70 backdrop-blur-sm border-slate-200 dark:border-gray-700 overflow-hidden cursor-pointer hover:shadow-md transition-all">
+                  <CardContent className="p-3">
+                    <div className="flex items-center">
+                      <BookOpen className="h-5 w-5 mr-2 text-purple-600 dark:text-purple-400" />
+                      <div>
+                        <div className="text-sm font-medium text-slate-700 dark:text-white">ছোট্ট পরীক্ষা</div>
+                        <div className="text-xs text-slate-500 dark:text-slate-400">পরীক্ষা দাও</div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                transition={{ duration: 0.2 }}
+                onClick={() => {
+                  playButtonSound()
+                  setShowAIChat(!showAIChat)
+                }}
+              >
+                <Card className="bg-slate-50 dark:bg-gray-800/70 backdrop-blur-sm border-slate-200 dark:border-gray-700 overflow-hidden cursor-pointer hover:shadow-md transition-all">
+                  <CardContent className="p-3">
+                    <div className="flex items-center">
+                      <MessageSquare className="h-5 w-5 mr-2 text-cyan-600 dark:text-cyan-400" />
+                      <div>
+                        <div className="text-sm font-medium text-slate-700 dark:text-white">AI Assistant</div>
+                        <div className="text-xs text-slate-500 dark:text-slate-400">Ask questions</div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            </div>
+
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+              transition={{ duration: 0.2 }}
+              onClick={() => {
+                playButtonSound()
+                if (!showMembersSection && !waitingForMembers) {
+                  setWaitingForMembers(true)
+                }
+              }}
+              className="mb-4"
+            >
+              <Card className="bg-gradient-to-r from-purple-600 to-indigo-600 dark:from-purple-700 dark:to-indigo-700 text-white overflow-hidden cursor-pointer hover:shadow-md transition-all">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <Users className="h-5 w-5 mr-2" />
+                      <div>
+                        <div className="font-medium">Member Community Tough</div>
+                        <div className="text-xs text-white/70">View all members</div>
+                      </div>
+                    </div>
+                    {waitingForMembers ? (
+                      <div className="text-sm bg-white/20 px-2 py-1 rounded">{formatTime(memberWaitTime)}</div>
+                    ) : (
+                      <Badge className="bg-white/20 hover:bg-white/30">Visit</Badge>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+              transition={{ duration: 0.2 }}
+              className="mb-4"
+              onClick={() => {
+                playButtonSound()
+                window.open("https://example.com/books", "_blank")
+              }}
+            >
+              <Card className="bg-gradient-to-r from-emerald-600 to-teal-600 dark:from-emerald-700 dark:to-teal-700 text-white overflow-hidden cursor-pointer hover:shadow-md transition-all">
+                <CardContent className="p-4">
+                  <div className="flex items-center">
+                    <BookMarked className="h-5 w-5 mr-2" />
+                    <div>
+                      <div className="font-medium">GOOD NEWS! 📚✨</div>
+                      <div className="text-xs text-white/70 mt-1">IF YOU DO GOOD, AI WILL HELP YOU MOVE FORWARD</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {showMembersSection && (
+              <div className="space-y-4">
+                <div className="relative">
+                  <Input
+                    placeholder="Search members..."
+                    className="bg-slate-50 dark:bg-gray-800/50 backdrop-blur-sm border-slate-200 dark:border-gray-700 pl-8"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                  <Users className="absolute left-2 top-2.5 h-4 w-4 text-slate-500 dark:text-slate-400" />
+                </div>
+
+                <motion.div
+                  className="space-y-2 max-h-[60vh] overflow-y-auto pr-1"
+                  variants={containerVariants}
+                  initial="hidden"
+                  animate={animationComplete ? "visible" : "hidden"}
+                >
+                  {filteredMembers.map((member, index) => (
+                    <motion.div
+                      key={member.id}
+                      variants={itemVariants}
+                      whileHover={{ scale: 1.02 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <Card
+                        className={`bg-white dark:bg-gray-800/70 backdrop-blur-sm border-slate-200 dark:border-gray-700 hover:bg-slate-50 dark:hover:bg-gray-800/90 transition-all ${
+                          member.special ? "border-l-4 border-l-yellow-500" : ""
+                        }`}
+                      >
+                        <CardContent className="p-3 flex justify-between items-center">
+                          <div className="flex items-center gap-3">
+                            <div className="relative">
+                              <div className="h-10 w-10 rounded-full bg-gradient-to-br from-purple-600 to-indigo-700 flex items-center justify-center">
+                                <Sparkles className="h-5 w-5 text-white" />
+                              </div>
+                            </div>
+                            <div>
+                              <div className="font-medium flex items-center text-slate-800 dark:text-white">
+                                {member.name}
+                                {member.verified && (
+                                  <motion.div
+                                    whileHover={{ rotate: 360 }}
+                                    transition={{ duration: 0.5 }}
+                                    className="ml-1"
+                                  >
+                                    <Badge
+                                      className={`ml-1 ${
+                                        member.special
+                                          ? "bg-gradient-to-r from-yellow-500 to-amber-500 text-white"
+                                          : "bg-gradient-to-r from-emerald-500 to-green-600 text-white"
+                                      }`}
+                                    >
+                                      <Shield className="h-3 w-3 mr-1" /> Verified
+                                    </Badge>
+                                  </motion.div>
+                                )}
+                              </div>
+                              <div className="text-xs text-slate-500 dark:text-slate-400">Member #{member.id}</div>
+                            </div>
+                          </div>
+                          <div className="flex flex-col items-end">
+                            <div
+                              className={`font-bold ${
+                                member.special
+                                  ? "text-yellow-600 dark:text-yellow-400"
+                                  : member.amount < 1500
+                                    ? "text-orange-600 dark:text-orange-400"
+                                    : "text-green-600 dark:text-green-400"
+                              }`}
+                            >
+                              ${member.amount.toLocaleString()}
+                            </div>
+                            <div className="text-xs text-slate-500 dark:text-slate-400">Support from Agency</div>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-6 px-2 text-xs text-cyan-600 dark:text-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-300 hover:bg-slate-100 dark:hover:bg-gray-700/50 mt-1"
+                              onClick={() => {
+                                playButtonSound()
+                                setSelectedMember(member)
+                              }}
+                            >
+                              <Eye className="h-3 w-3 mr-1" /> Details
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  ))}
+                </motion.div>
+              </div>
+            )}
+          </CardContent>
+          <CardFooter className="px-6 py-3 bg-slate-50 dark:bg-gray-900/80 border-t border-slate-200 dark:border-gray-800 flex justify-center">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1, duration: 1 }}
+              className="text-xs text-center text-slate-500 dark:text-slate-400"
+            >
+              <span className="bg-gradient-to-r from-purple-600 to-pink-500 text-transparent bg-clip-text font-bold">
+                Powered by CXT AI V1
+              </span>
+            </motion.div>
+          </CardFooter>
+        </Card>
+      </motion.div>
+
+      {/* Member Details Dialog */}
+      <AnimatePresence>
+        {selectedMember && (
+          <Dialog open={!!selectedMember} onOpenChange={() => setSelectedMember(null)}>
+            <DialogContent className="bg-white dark:bg-gray-900 border-slate-200 dark:border-gray-800 text-slate-900 dark:text-white max-w-sm">
+              <DialogHeader>
+                <DialogTitle className="flex items-center">
+                  <Sparkles className="h-5 w-5 mr-2 text-yellow-600 dark:text-yellow-400" />
+                  {selectedMember.name} Details
+                </DialogTitle>
+                <DialogDescription className="text-slate-500 dark:text-slate-400">
+                  Member #{selectedMember.id}
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div className="flex justify-center">
+                  <div className="h-20 w-20 rounded-full bg-gradient-to-br from-purple-600 to-indigo-700 flex items-center justify-center">
+                    <Sparkles className="h-10 w-10 text-white" />
+                  </div>
+                </div>
+
+                <div className="bg-slate-50 dark:bg-gray-800 p-3 rounded-md">
+                  <div className="text-sm text-slate-500 dark:text-slate-400">Support Amount</div>
+                  <div
+                    className={`text-xl font-bold ${
+                      selectedMember.special
+                        ? "text-yellow-600 dark:text-yellow-400"
+                        : selectedMember.amount < 1500
+                          ? "text-orange-600 dark:text-orange-400"
+                          : "text-green-600 dark:text-green-400"
+                    }`}
                   >
-                    <Bell className="h-4 w-4" />
-                  </Button>
-                </div>
-
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-600 dark:text-slate-400">Total Members:</span>
-                    <span className="font-bold text-slate-800 dark:text-white">{members.length}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-600 dark:text-slate-400">Active Members:</span>
-                    <span className="font-bold text-slate-800 dark:text-white">42</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-600 dark:text-slate-400">Success Rate:</span>
-                    <span className="font-bold text-green-600 dark:text-green-400">87%</span>
+                    ${selectedMember.amount.toLocaleString()}
                   </div>
                 </div>
-              </CardContent>
-            </Card>
 
-            <SuccessSection />
+                <div className="bg-slate-50 dark:bg-gray-800 p-3 rounded-md">
+                  <div className="text-sm text-slate-500 dark:text-slate-400">Repayment Date</div>
+                  <div className="flex items-center text-slate-800 dark:text-white">
+                    <Calendar className="h-4 w-4 mr-2 text-cyan-600 dark:text-cyan-400" />
+                    {selectedMember.repaymentDate}
+                  </div>
 
-            <LearningContent />
-          </div>
-        </div>
-      </div>
+                  {selectedMember.secondRepaymentDate && (
+                    <div className="flex items-center text-slate-800 dark:text-white mt-2">
+                      <Calendar className="h-4 w-4 mr-2 text-cyan-600 dark:text-cyan-400" />
+                      {selectedMember.secondRepaymentDate}
+                    </div>
+                  )}
+                </div>
 
-      <StickyMenu />
+                <div className="bg-slate-50 dark:bg-gray-800 p-3 rounded-md">
+                  <div className="text-sm text-slate-500 dark:text-slate-400">Status</div>
+                  <div className="flex items-center">
+                    <Badge
+                      className={`${
+                        selectedMember.special
+                          ? "bg-gradient-to-r from-yellow-500 to-amber-500 text-white"
+                          : "bg-gradient-to-r from-emerald-500 to-green-600 text-white"
+                      }`}
+                    >
+                      <Shield className="h-3 w-3 mr-1" /> Verified
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+              <DialogClose asChild>
+                <Button
+                  variant="outline"
+                  className="w-full mt-2 border-slate-200 dark:border-gray-700 text-slate-800 dark:text-white hover:bg-slate-100 dark:hover:bg-gray-800"
+                  onClick={() => playButtonSound()}
+                >
+                  <X className="h-4 w-4 mr-2" /> Close
+                </Button>
+              </DialogClose>
+            </DialogContent>
+          </Dialog>
+        )}
+      </AnimatePresence>
     </main>
   )
 }

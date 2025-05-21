@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Check, Lock, Bot, Shield, Key, Fingerprint } from "lucide-react"
+import { Check, Lock, Bot } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
@@ -21,7 +21,6 @@ export function PinEntry({ onSuccess }: PinEntryProps) {
   const [showAITransfer, setShowAITransfer] = useState(false)
   const [transferComplete, setTransferComplete] = useState(false)
   const [transferProgress, setTransferProgress] = useState(0)
-  const [buttonSound] = useState(typeof Audio !== "undefined" ? new Audio("/click.mp3") : null)
 
   const CORRECT_PIN = "262"
   const MAX_ATTEMPTS = 3
@@ -42,16 +41,7 @@ export function PinEntry({ onSuccess }: PinEntryProps) {
     }
   }, [])
 
-  const playButtonSound = () => {
-    if (buttonSound) {
-      buttonSound.currentTime = 0
-      buttonSound.play().catch((e) => console.log("Audio play failed:", e))
-    }
-  }
-
   const handlePinSubmit = () => {
-    playButtonSound()
-
     if (isBlocked) return
 
     if (pin === CORRECT_PIN) {
@@ -76,8 +66,6 @@ export function PinEntry({ onSuccess }: PinEntryProps) {
   }
 
   const handleTransfer = () => {
-    playButtonSound()
-
     // Simulate AI transfer
     let progress = 0
     const interval = setInterval(() => {
@@ -122,89 +110,11 @@ export function PinEntry({ onSuccess }: PinEntryProps) {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
-          {/* Security animation background */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <motion.div
-              className="absolute top-10 left-10 opacity-20"
-              animate={{
-                y: [0, 100, 200, 300, 400, 500, 600, 700],
-                x: [0, 50, 100, 150, 200, 250, 300, 350],
-                opacity: [0.2, 0.1, 0.2],
-              }}
-              transition={{ duration: 20, repeat: Number.POSITIVE_INFINITY, repeatType: "loop" }}
-            >
-              <Shield className="h-32 w-32 text-blue-500" />
-            </motion.div>
-
-            <motion.div
-              className="absolute top-10 right-10 opacity-20"
-              animate={{
-                y: [0, 100, 200, 300, 400, 500, 600, 700],
-                x: [0, -50, -100, -150, -200, -250, -300, -350],
-                opacity: [0.2, 0.1, 0.2],
-              }}
-              transition={{ duration: 25, repeat: Number.POSITIVE_INFINITY, repeatType: "loop" }}
-            >
-              <Lock className="h-32 w-32 text-purple-500" />
-            </motion.div>
-
-            <motion.div
-              className="absolute bottom-10 left-10 opacity-20"
-              animate={{
-                y: [0, -100, -200, -300, -400, -500, -600, -700],
-                x: [0, 50, 100, 150, 200, 250, 300, 350],
-                opacity: [0.2, 0.1, 0.2],
-              }}
-              transition={{ duration: 22, repeat: Number.POSITIVE_INFINITY, repeatType: "loop" }}
-            >
-              <Key className="h-32 w-32 text-cyan-500" />
-            </motion.div>
-
-            <motion.div
-              className="absolute bottom-10 right-10 opacity-20"
-              animate={{
-                y: [0, -100, -200, -300, -400, -500, -600, -700],
-                x: [0, -50, -100, -150, -200, -250, -300, -350],
-                opacity: [0.2, 0.1, 0.2],
-              }}
-              transition={{ duration: 18, repeat: Number.POSITIVE_INFINITY, repeatType: "loop" }}
-            >
-              <Fingerprint className="h-32 w-32 text-green-500" />
-            </motion.div>
-
-            {/* Binary code rain effect */}
-            <div className="absolute inset-0 overflow-hidden">
-              {Array.from({ length: 20 }).map((_, i) => (
-                <motion.div
-                  key={i}
-                  className="absolute text-xs font-mono text-green-500 opacity-20"
-                  style={{
-                    left: `${Math.random() * 100}%`,
-                    top: -20,
-                  }}
-                  animate={{
-                    y: [0, window.innerHeight + 20],
-                    opacity: [0.2, 0.1, 0.2],
-                  }}
-                  transition={{
-                    duration: 5 + Math.random() * 10,
-                    repeat: Number.POSITIVE_INFINITY,
-                    delay: Math.random() * 5,
-                  }}
-                >
-                  {Array.from({ length: 10 })
-                    .map(() => Math.round(Math.random()))
-                    .join("")}
-                </motion.div>
-              ))}
-            </div>
-          </div>
-
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ type: "spring", damping: 20 }}
-            className="w-full max-w-sm relative z-10"
+            className="w-full max-w-sm"
           >
             <Card className="bg-white dark:bg-gray-900 border-slate-200 dark:border-gray-800 overflow-hidden shadow-xl">
               <CardContent className="p-0">
